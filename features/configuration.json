@@ -1,0 +1,82 @@
+{
+	"$schema": "https://raw.githubusercontent.com/liferay/liferay-js-toolkit/master/resources/schemas/configuration.schema.json",
+	"system": {
+		"category": "cargarDatosInputJs",
+		"name": "cargarDatosInputJs",
+		"fields": {
+			"fruit": {
+				"type": "string",
+				"name": "fruit",
+				"description": "fruit-help",
+				"default": "orange",
+				"options": {
+					"orange": "an-orange",
+					"pear": "a-pear",
+					"apple": "an-apple"
+				}
+			}
+		}
+	},
+	"portletInstance": {
+		"fields": {
+			"api": {
+				"type": "string",
+				"name": "Api",
+				"description": "Ingrese la url del servicio",
+				"default": ""
+			},
+			"ids": {
+				"type": "string",
+				"name": "Ids de los elementos de inputs",
+				"description": "Ingrese los id de los input donde se mostrara la información separados por comas y un espacio. Ejemplo (id1, id2, id3)",
+				"default": ""
+			},
+			"propiedades": {
+				"type": "string",
+				"name": "Nombre de propiedades",
+				"description": "Ingrese las propiedades de la api mismo orden de los id",
+				"default": ""
+			},
+			"idsDates": {
+				"type": "string",
+				"name": "Ids de los elementos de fechas",
+				"description": "Ingrese los id de los inputsDate separados por comas y un espacio. Ejemplo (fecha1, fecha2, fecha3)",
+				"default": ""
+			},
+			"propDates": {
+				"type": "string",
+				"name": "Nombre de propiedades de tipo fecha",
+				"description": "Ingrese las propiedades de la api mismo orden de los ids de fechas",
+				"default": ""
+			},
+			"idsSelects": {
+				"type": "string",
+				"name": "Ids de los elementos selects",
+				"description": "Ingrese los id de los elementos selects separados por comas y un espacio. Ejemplo (select1, select2, select3)",
+				"default": ""
+			},
+			"propSelects": {
+				"type": "string",
+				"name": "Nombre de propiedades de tipo select",
+				"description": "Ingrese las propiedades de la api mismo orden de los ids de elementos selects",
+				"default": ""
+			},
+			"propSelectsValues": {
+				"type": "string",
+				"name": "Nombre de valores o id ",
+				"description": "Ingrese los value de la api mismo orden de las propiedades",
+				"default": ""
+			},
+			"almaLocal": {
+				"type": "string",
+				"name": "Guardar datos en el sitio",
+				"description": "Datos extraidos del servicio estaran en variables de sesion",
+				"default": "no",
+				"options": {
+					"no": "NO",
+					"si": "SI"
+				}
+			}
+		}
+	}
+}
