@@ -10,7 +10,7 @@
 function main(params) {
     
     var node = document.getElementById(params.portletElementId);
-    const {api, ids, propiedades, idsDates, propDates, idsSelects, propSelects, propSelectsValues, almaLocal} = params.configuration.portletInstance;
+    const {api, ids, propiedades, idsDates, propDates, idsSelects, propSelects, propSelectsValues, almaLocal, idActualizar} = params.configuration.portletInstance;
     let inputs = ids.split(', ');
     let prop = propiedades.split(', ');
     let propFechas = propDates.split(', ');
@@ -43,8 +43,14 @@ function main(params) {
             success: function (data) {
                 
                 const {persona} = data;
-                if (persona["tipo_id"]== "10"){
-                        
+                // document.writeln(Object.keys(persona));
+               
+                for (var i in persona) {
+                    // document.writeln('<p>' + persona[i] + '</p>');
+                    console.log(i)
+                    console.log(persona[i])
+                    
+                    localStorage.setItem(i, persona[i])
                 }
                 for(x = 0; x < inputs.length; x++){
 
@@ -52,7 +58,7 @@ function main(params) {
                     
                     document.getElementById(inputs[x]).value = persona[prop[x]];
                     
-                    localStorage.setItem(prop[x], persona[prop[x]])
+                    // localStorage.setItem(prop[x], persona[prop[x]])
                     
                    
                 }
@@ -61,7 +67,7 @@ function main(params) {
                     
                     setDate(idsFechas[y], persona[propFechas[y]])
                     
-                    localStorage.setItem(propFechas[y], persona[propFechas[y]])
+                    // localStorage.setItem(propFechas[y], persona[propFechas[y]])
                     
                 }
 
@@ -96,7 +102,7 @@ function main(params) {
                     agregar(idsSelect[x], persona[propSelect[x]], persona[propSelectsValue[x]])
                     
                     
-                    localStorage.setItem(propSelectsValue[x], persona[propSelectsValue[x]])
+                    // localStorage.setItem(propSelectsValue[x], persona[propSelectsValue[x]])
                   
                   
                }
@@ -139,6 +145,78 @@ function main(params) {
           
        }
     }
+
+    
+
+        document.getElementById("buttonActualizar").addEventListener("click", function(e){
+            e.preventDefault()
+            let datosInputs = []
+            let datosFechas = []
+            let datosSelect= []
+            for(x = 0; x < inputs.length; x++){   
+                datosInputs[x] = document.getElementById(inputs[x]).value
+            }
+            console.log(propFechas)   
+            for(y = 0; y < propFechas.length; y++){
+                console.log(propFechas[y])      
+                // datosFechas[y] = document.getElementById(propFechas[y]).value
+            }
+
+            for(x = 0; x < idsSelect.length; x++){
+
+                datosSelect[x] =  document.getElementById(idsSelect[x]).value;
+                
+           }
+           const dataInput = datosInputs.concat(datosSelect, datosFechas);
+
+            // console.log(datosInputs)
+            // console.log(datosFechas)
+            // console.log(propFechas)
+            console.log(dataInput)
+            const valoresServicio = cargarDatosLocalStorage()
+            registrarCambios(dataInput, valoresServicio)
+        })
+
+        
+        function cargarDatosLocalStorage(){
+            let inputsLocal = []
+            let selectLocal = []
+            let fechaLocal = []
+            for(x = 0; x < inputs.length; x++){   
+                inputsLocal[x] = localStorage.getItem(prop[x]);
+            }
+    
+            for(y = 0; y < propFechas.length; y++){
+                 
+                fechaLocal[y] = localStorage.getItem(propFechas[y])
+            }
+            for(x = 0; x < idsSelect.length; x++){
+
+                selectLocal[x] = localStorage.getItem(propSelectsValue[x])
+              
+           }
+           const dataInputLocal = inputsLocal.concat(selectLocal, fechaLocal);
+        //    console.log(inputsLocal)
+        //     console.log(selectLocal)
+            console.log(dataInputLocal)
+            return dataInputLocal
+        }
+
+        function registrarCambios(dataInput, dataInputLocal){
+            let cambios = []
+            for(x = 0; x < dataInputLocal.length; x++){
+    
+                if(dataInput[x] != dataInputLocal[x]){
+                    cambios.push(dataInput[x])
+                }
+            }
+            console.log("cambios")
+            console.log(cambios)
+        }
+        
+    
+
+
     // validar()
 
         //   function getDateToday(){

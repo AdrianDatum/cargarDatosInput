@@ -76,6 +76,12 @@
 					"no": "NO",
 					"si": "SI"
 				}
+			},
+			"idActualizar": {
+				"type": "string",
+				"name": "Id boton actualizar",
+				"description": "",
+				"default": ""
 			}
 		}
 	}
