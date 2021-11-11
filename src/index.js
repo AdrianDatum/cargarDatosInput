@@ -25,10 +25,10 @@ function main(params) {
     // let idsSelect = ["selectTipoDoc", "select2", "inputdoc14"]
     // let propSelect = ["desc_tipo_id", "desc_estado_civil", "desc_genero"]
     // let propSelectsValue = ["tipo_id", "estado_civil", "cod_genero"]
-    console.log(inputs)
-    console.log(prop)
-    console.log(propFechas)
-    console.log(idsSelect)
+    // console.log(inputs)
+    // console.log(prop)
+    // console.log(propFechas)
+    // console.log(idsSelect)
     function cargarDatos(){
     $.ajax
         ({
@@ -46,17 +46,21 @@ function main(params) {
                 // document.writeln(Object.keys(persona));
                
                 for (var i in persona) {
-                    // document.writeln('<p>' + persona[i] + '</p>');
-                    console.log(i)
-                    console.log(persona[i])
+                    
+                    // console.log(i)
+                    // console.log(persona[i])
                     
                     localStorage.setItem(i, persona[i])
                 }
                 for(x = 0; x < inputs.length; x++){
-
-                    
-                    
-                    document.getElementById(inputs[x]).value = persona[prop[x]];
+                    // console.log("inputs")
+                    // console.log(inputs[x])
+                    try{
+                        document.getElementById(inputs[x]).value = persona[prop[x]];
+                    }
+                    catch(err){
+                        console.log(err)
+                    }
                     
                     // localStorage.setItem(prop[x], persona[prop[x]])
                     
@@ -151,27 +155,38 @@ function main(params) {
         document.getElementById("buttonActualizar").addEventListener("click", function(e){
             e.preventDefault()
             let datosInputs = []
-            let datosFechas = []
+            let datosFechas = [""]
             let datosSelect= []
-            for(x = 0; x < inputs.length; x++){   
-                datosInputs[x] = document.getElementById(inputs[x]).value
+            let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"]
+            console.log("inputs actualizar")
+            console.log(inputs)
+            for(x = 0; x < inputs.length; x++){  
+                try{
+                    datosInputs[x] = document.getElementById(inputs[x]).value
+                }
+                catch(err){
+
+                }
             }
             console.log(propFechas)   
-            for(y = 0; y < propFechas.length; y++){
+            for(y = 0; y < fechasId.length; y++){
+                console.log("id fecha")
                 console.log(propFechas[y])      
-                // datosFechas[y] = document.getElementById(propFechas[y]).value
+                datosFechas[y] = document.getElementById(fechasId[y]).value
             }
 
             for(x = 0; x < idsSelect.length; x++){
-
-                datosSelect[x] =  document.getElementById(idsSelect[x]).value;
-                
+                let seleccion = document.getElementById(idsSelect[x])
+                // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
+                datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
            }
            const dataInput = datosInputs.concat(datosSelect, datosFechas);
-
+           
+        //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
             // console.log(datosInputs)
             // console.log(datosFechas)
             // console.log(propFechas)
+            console.log("valores inputs")
             console.log(dataInput)
             const valoresServicio = cargarDatosLocalStorage()
             registrarCambios(dataInput, valoresServicio)
@@ -182,6 +197,9 @@ function main(params) {
             let inputsLocal = []
             let selectLocal = []
             let fechaLocal = []
+            let idinputsLocal = []
+            let idselectLocal = []
+            let idfechaLocal = []
             for(x = 0; x < inputs.length; x++){   
                 inputsLocal[x] = localStorage.getItem(prop[x]);
             }
@@ -192,26 +210,41 @@ function main(params) {
             }
             for(x = 0; x < idsSelect.length; x++){
 
-                selectLocal[x] = localStorage.getItem(propSelectsValue[x])
+                selectLocal[x] = localStorage.getItem(propSelect[x])
               
            }
            const dataInputLocal = inputsLocal.concat(selectLocal, fechaLocal);
         //    console.log(inputsLocal)
         //     console.log(selectLocal)
+        console.log("valores locales")
             console.log(dataInputLocal)
             return dataInputLocal
         }
 
+
+
         function registrarCambios(dataInput, dataInputLocal){
+            
+            const idsDataInput = inputs.concat(idsSelect, idsFechas);
             let cambios = []
+            let ids = []
             for(x = 0; x < dataInputLocal.length; x++){
     
                 if(dataInput[x] != dataInputLocal[x]){
                     cambios.push(dataInput[x])
+                    ids.push(idsDataInput[x])
                 }
             }
             console.log("cambios")
-            console.log(cambios)
+            console.log(dataInput)
+            console.log(dataInputLocal)
+            if(cambios.length){
+
+                localStorage.setItem("dataCambiada", JSON.stringify(cambios))
+                localStorage.setItem("idsCambios", JSON.stringify(ids))
+                window.location.href = "https://desa.virtualafpconfia.com/web/afiliado/confirmar";
+            }
+            
         }
         
     
