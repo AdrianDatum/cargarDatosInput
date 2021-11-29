@@ -18,17 +18,7 @@ function main(params) {
     let idsSelect = idsSelects.split(', ');
     let propSelect = propSelects.split(', ');
     let propSelectsValue = propSelectsValues.split(', ');
-    // let inputs = ["inputdoc5", "inputdoc6", "inputdoc7", "inputdoc8", "inputdoc9", "inputdoc10", "inputdoc11", "inputdoc13", "inputdoc15", "inputdoc16", "inputdoc17", "inputdoc23", "inputisss1", "inputinpep1", "inputnit2", "inputdoc1", "inputdoc20"];  
-    // let prop = ["primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "apellido_casada", "conocido_por", "nombre_completo", "nombre_padre", "nombre_madre", "nombre_conyuge", "profesion_afiliado", "lugar_expedicion_id", "num_id"]; 
-    // let propFechas = ["fecha_expiracion_id", "fecha_expedicion_id", "fecha_nacimiento", "fecha_emision_nit", "fecha_emision_isss", "fecha_emision_inpep"]
-    // let idsFechas = ["inputdoc3", "inputdoc2", "inputdoc18", "inputNit", "inputisss9", "inputinpep7"]
-    // let idsSelect = ["selectTipoDoc", "select2", "inputdoc14"]
-    // let propSelect = ["desc_tipo_id", "desc_estado_civil", "desc_genero"]
-    // let propSelectsValue = ["tipo_id", "estado_civil", "cod_genero"]
-    // console.log(inputs)
-    // console.log(prop)
-    // console.log(propFechas)
-    // console.log(idsSelect)
+
     function cargarDatos(){
     $.ajax
         ({
@@ -43,18 +33,13 @@ function main(params) {
             success: function (data) {
                 
                 const {persona} = data;
-                // document.writeln(Object.keys(persona));
                
                 for (var i in persona) {
-                    
-                    // console.log(i)
-                    // console.log(persona[i])
                     
                     localStorage.setItem(i, persona[i])
                 }
                 for(x = 0; x < inputs.length; x++){
-                    // console.log("inputs")
-                    // console.log(inputs[x])
+                 
                     try{
                         document.getElementById(inputs[x]).value = persona[prop[x]];
                     }
@@ -62,7 +47,7 @@ function main(params) {
                         console.log(err)
                     }
                     
-                    // localStorage.setItem(prop[x], persona[prop[x]])
+                    localStorage.setItem(prop[x], persona[prop[x]])
                     
                    
                 }
@@ -71,32 +56,11 @@ function main(params) {
                     
                     setDate(idsFechas[y], persona[propFechas[y]])
                     
-                    // localStorage.setItem(propFechas[y], persona[propFechas[y]])
+                    localStorage.setItem(propFechas[y], persona[propFechas[y]])
                     
                 }
 
-              const agregar = (id, texto, valor) => {
-                
-                  let selector = document.getElementById(id)
-                  const option = document.createElement('option');
-                  option.value = valor;
-                  option.text = texto;
-                  if(id == "selectTipoDoc"){
-                    const optionC = document.createElement('option');
-                    optionC.value = 3;
-                    optionC.text = "CARNET DE RESIDENTE";
-                    selector.appendChild(optionC);
-                  }else if(id == "selectEstadoCivil"){
-                    const optionE = document.createElement('option');
-                    optionE.value = 3;
-                    optionE.text = "SOLTERO(A)";
-                    selector.appendChild(optionE);
-                  }
-                  
-                  selector.appendChild(option);
-                  
-                  selector.value = valor;
-                };
+              
 
                 for(x = 0; x < idsSelect.length; x++){
 
@@ -106,7 +70,7 @@ function main(params) {
                     agregar(idsSelect[x], persona[propSelect[x]], persona[propSelectsValue[x]])
                     
                     
-                    // localStorage.setItem(propSelectsValue[x], persona[propSelectsValue[x]])
+                    localStorage.setItem(propSelectsValue[x], persona[propSelectsValue[x]])
                   
                   
                }
@@ -126,12 +90,18 @@ function main(params) {
                 
             }
         }).fail(function () {
+            cargarDatosLocal()
         });
     }
+    try{
+        cargarDatos()
+    }
+    catch(err){
+        cargarDatosLocal()
+    }
 
-    cargarDatos()
+    function cargarDatosLocal(){
 
-    function cargarDatosLocalStorage(){
         for(x = 0; x < inputs.length; x++){   
             document.getElementById(inputs[x]).value = localStorage.getItem(prop[x]);
         }
@@ -142,57 +112,137 @@ function main(params) {
         }
         for(x = 0; x < idsSelect.length; x++){
 
-            // if(prop[x] == "desc_tipo_id"){
-            //     formatoNumeros(persona[propSelectsValue[x]], idsSelect[x])
-            // }
             agregar(idsSelect[x], localStorage.getItem(propSelect[x]), localStorage.getItem(propSelectsValue[x]))
           
        }
     }
 
-    
+    // const optionC = document.createElement('option');
+    // optionC.value = 3;
+    // optionC.text = "CARNET DE RESIDENTE";
+
+    function agregar(id, texto, valor){
+                
+        let selector = document.getElementById(id)
+        const option = document.createElement('option');
+        option.value = valor;
+        option.text = texto;
+        // if(id == "selectTipoDoc"){
+        //   const optionC = document.createElement('option');
+        //   optionC.value = 3;
+        //   optionC.text = "CARNET DE RESIDENTE";
+        //   selector.appendChild(optionC);
+        // }else if(id == "selectEstadoCivil"){
+        //   const optionE = document.createElement('option');
+        //   optionE.value = 3;
+        //   optionE.text = "SOLTERO(A)";
+        //   selector.appendChild(optionE);
+        // }
+        
+        selector.appendChild(option);
+        
+        selector.value = valor;
+      };
 
         document.getElementById("buttonActualizar").addEventListener("click", function(e){
             e.preventDefault()
-            let datosInputs = []
-            let datosFechas = [""]
-            let datosSelect= []
-            let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"]
-            console.log("inputs actualizar")
-            console.log(inputs)
-            for(x = 0; x < inputs.length; x++){  
-                try{
-                    datosInputs[x] = document.getElementById(inputs[x]).value
-                }
-                catch(err){
+            let respuesta = true
 
+            respuesta = validaValores()
+            console.log(respuesta)
+            if(respuesta){
+                let datosInputs = []
+                let datosFechas = [""]
+                let datosSelect= []
+                let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"]
+                console.log("inputs actualizar")
+                console.log(inputs)
+                for(x = 0; x < inputs.length; x++){  
+                    try{
+                        datosInputs[x] = document.getElementById(inputs[x]).value
+                    }
+                    catch(err){
+    
+                    }
                 }
+                console.log(propFechas)   
+                for(y = 0; y < fechasId.length; y++){
+                    console.log("id fecha")
+                    console.log(propFechas[y])      
+                    datosFechas[y] = document.getElementById(fechasId[y]).value
+                }
+    
+                for(x = 0; x < idsSelect.length; x++){
+                    let seleccion = document.getElementById(idsSelect[x])
+                    // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
+                    datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
+               }
+               const dataInput = datosInputs.concat(datosSelect, datosFechas);
+               
+            //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
+                // console.log(datosInputs)
+                // console.log(datosFechas)
+                // console.log(propFechas)
+                console.log("valores inputs")
+                console.log(dataInput)
+                const valoresServicio = cargarDatosLocalStorage()
+                registrarCambios(dataInput, valoresServicio)
+            }else{
+                $("#modalRequerido").modal("show")
             }
-            console.log(propFechas)   
-            for(y = 0; y < fechasId.length; y++){
-                console.log("id fecha")
-                console.log(propFechas[y])      
-                datosFechas[y] = document.getElementById(fechasId[y]).value
-            }
-
-            for(x = 0; x < idsSelect.length; x++){
-                let seleccion = document.getElementById(idsSelect[x])
-                // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
-                datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
-           }
-           const dataInput = datosInputs.concat(datosSelect, datosFechas);
-           
-        //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
-            // console.log(datosInputs)
-            // console.log(datosFechas)
-            // console.log(propFechas)
-            console.log("valores inputs")
-            console.log(dataInput)
-            const valoresServicio = cargarDatosLocalStorage()
-            registrarCambios(dataInput, valoresServicio)
+            
+            
         })
 
+    document.getElementById("idTipoDocumento").addEventListener("change", function(){
         
+        
+    })
+
+
+
+    // document.getElementById("select").selectedIndex =
+    function validaValores(){
+
+        let valor = document.getElementById("selectTipoDoc").value
+        
+        if(valor == "10"){
+            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento", "selectEstadoCivil", "selectGenero", "selectNacionalidad", "lugar_expedicion_id", "nombre_padre", "nombre_madre", "nombre_conyuge", "profesion_afiliado"]
+        }else if(valor == "2"){
+            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
+        }else if(valor == "3"){
+            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
+        }
+
+        for(x = 0; x < requeridos.length; x++){
+                
+            let valorInput = document.getElementById(requeridos[x]).value
+            
+            if(valorInput == null || valorInput.length == 0 || valorInput === "" || valorInput === "DEFAULT"){
+                
+                return false
+            }
+            
+        }
+
+        // let requeridos = ["Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "inputLugarExpedicion", "idInputNumDocumento"]
+
+           
+        //     for(x = 0; x < requeridos.length; x++){
+                
+        //        let valorInput = document.getElementById(requeridos[x]).value
+        //         console.log(valorInput)
+        //         if(valorInput == null || valorInput.length == 0 || valorInput === ""){
+        //             // console.log("no")
+        //             // console.log(valorInput)
+        //             return false
+        //         }
+                
+        //     }
+
+        
+
+    }
         function cargarDatosLocalStorage(){
             let inputsLocal = []
             let selectLocal = []
@@ -239,7 +289,8 @@ function main(params) {
             console.log(dataInput)
             console.log(dataInputLocal)
             if(cambios.length){
-
+                // storage.removeItem("dataCambiada");
+                // storage.removeItem("idsCambios");
                 localStorage.setItem("dataCambiada", JSON.stringify(cambios))
                 localStorage.setItem("idsCambios", JSON.stringify(ids))
                 window.location.href = "https://desa.virtualafpconfia.com/web/afiliado/confirmar";
@@ -247,53 +298,56 @@ function main(params) {
             
         }
         
-    
+        
 
-
+    // window.seleccionar = () => {
+    //     console.log("hola se llamo desde portlet")
+    //     document.getElementById("selectTipoDoc").value = "3"
+    // }
     // validar()
 
-        //   function getDateToday(){
+          function getDateToday(){
 
-        //     var today = new Date();
-        //     var dd = today.getDate();
-        //     var mm = today.getMonth() + 1; //January is 0!
-        //     var yyyy = today.getFullYear();
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
           
-        //     if (dd < 10) {
-        //       dd = '0' + dd;
-        //     }
+            if (dd < 10) {
+              dd = '0' + dd;
+            }
           
-        //     if (mm < 10) {
-        //       mm = '0' + mm;
-        //     }
+            if (mm < 10) {
+              mm = '0' + mm;
+            }
           
-        //     today = yyyy + '-' + mm + '-' + dd;
-        //     return today;
+            today = yyyy + '-' + mm + '-' + dd;
+            return today;
           
-        //   }
+          }
 
-        //   function validarExpiracion(hoy, fechaDoc){
-        //     if(fechaDoc < hoy || fechaDoc == ""){
-        //       console.log(hoy)
-        //       console.log(fechaDoc)
-        //       console.log("expiradad")
-        //       $("#alert1").modal("show")
-        //       $("#select2").empty();
-        //       $("#selectTipoDoc").empty();
-        //       cargarDatos()
-        //     }
-        //   }
+          function validarExpiracion(hoy, fechaDoc){
+            if(fechaDoc < hoy || fechaDoc == ""){
+              console.log(hoy)
+              console.log(fechaDoc)
+              console.log("expiradad")
+              $("#alert1").modal("show")
+              $("#select2").empty();
+              $("#selectTipoDoc").empty();
+            //   cargarDatos()
+            }
+          }
 
         // //   let arregloIds = ["inputdoc3", "inputdoc2", "inputdoc18", "inputisss9", "inputinpep7", "inputnit7"];
 
         // // let arregloIds = ["inputdoc3", "inputdoc2", "inputdoc18"];
         // // idsFechas.forEach(id => {
-        //     document.getElementById("inputdoc3").onchange = function(){
-              
-        //           validarExpiracion(getDateToday(), this.value)
+            document.getElementById("idFechaExpiracion").onchange = function(){
+                  console.log("validar fecha")
+                  validarExpiracion(getDateToday(), this.value)
                 
                 
-        //     }
+            }
         // // })
 
         
