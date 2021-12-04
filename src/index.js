@@ -10,7 +10,10 @@
 function main(params) {
     
     var node = document.getElementById(params.portletElementId);
+    // obteniendo propiedades de las configuraciones
     const {api, ids, propiedades, idsDates, propDates, idsSelects, propSelects, propSelectsValues, almaLocal, idActualizar} = params.configuration.portletInstance;
+    
+    // convirtiendo en arreglo las propiedades de elementos separados por comas
     let inputs = ids.split(', ');
     let prop = propiedades.split(', ');
     let propFechas = propDates.split(', ');
@@ -19,7 +22,28 @@ function main(params) {
     let propSelect = propSelects.split(', ');
     let propSelectsValue = propSelectsValues.split(', ');
 
+// funcion para realizar la peticion al servicio
+
+// $(window).on("load",function(){
+// 	console.log("Evento load!!!");
+// 	setTimeout(verificarCarga, 3000);
+// });
+// function verificarCarga(){
+//     var verificarServicio = localStorage.getItem("cargado")
+//     console.log(verificarServicio)
+//     if(verificarServicio){
+//         cargarDatosLocal()
+//     }else{
+//         cargarDatos()
+//     }
+// }
+    
+
+
+
+
     function cargarDatos(){
+        var datosDoc = []
     $.ajax
         ({
             type: "POST",
@@ -31,13 +55,16 @@ function main(params) {
             },
             data: '{"id": "' + localStorage.getItem('id') + '"}',
             success: function (data) {
-                
+                // desestructurando respuesta
                 const {persona} = data;
                
+                // guardar en localstorage todo lo que viene en respuesta
                 for (var i in persona) {
                     
                     localStorage.setItem(i, persona[i])
                 }
+
+                // agregando la informacion en los campos inputs 
                 for(x = 0; x < inputs.length; x++){
                  
                     try{
@@ -46,75 +73,105 @@ function main(params) {
                     catch(err){
                         console.log(err)
                     }
-                    
+                    datosDoc.push({
+                        id: inputs[x],
+                        data: persona[prop[x]]
+                    })
                     localStorage.setItem(prop[x], persona[prop[x]])
                     
                    
                 }
-
+                // agregando los campos de fecha
                 for(y = 0; y < propFechas.length; y++){
                     
                     setDate(idsFechas[y], persona[propFechas[y]])
+                    let fecha1 = persona[propFechas[y]].split('/');
                     
+                    datosDoc.push({
+                        id: idsFechas[y],
+                        data: fecha1[2]+"-"+fecha1[1]+"-"+fecha1[0]
+                    })
                     localStorage.setItem(propFechas[y], persona[propFechas[y]])
                     
                 }
 
               
-
+                // agregando los campos en los select
                 for(x = 0; x < idsSelect.length; x++){
 
                     if(prop[x] == "desc_tipo_id"){
                         formatoNumeros(persona[propSelectsValue[x]], idsSelect[x])
                     }
-                    agregar(idsSelect[x], persona[propSelect[x]], persona[propSelectsValue[x]])
+                    // agregar(idsSelect[x], persona[propSelect[x]], persona[propSelectsValue[x]])
                     
+                    datosDoc.push({
+                        id: idsSelect[x],
+                        data: persona[propSelectsValue[x]]
+                    })
                     
                     localStorage.setItem(propSelectsValue[x], persona[propSelectsValue[x]])
                   
                   
                }
-
-                function setDate(id, fecha){
-                    // if(id == "idFechaExpiracion" && fecha == ""){
-                    //   $("#alert1").modal("show")
-                    // }
-                    var fecha1 = fecha.split('/');
-                    document.getElementById(id).value = fecha1[2]+"-"+fecha1[1]+"-"+fecha1[0];
-                    
-                  }
-
+               // conversion de fecha
+               
+                  // mensaje de ayuda dependiendo nacionalidad
                 if(persona["cod_nacionalidad"] != "222"){
                   $("#ayuda2").hide()
                 }
+                datosDoc.push({
+                    id: "idNacionalidad",
+                    data: "Salvadoreña"
+                })
                 
+                localStorage.setItem('datosDocumentos',JSON.stringify(datosDoc));
+                localStorage.setItem('cargado', true)
+                console.log("Cargado desde el servicio")
             }
         }).fail(function () {
             cargarDatosLocal()
         });
     }
     try{
+        // capturamos si es la primera vez que se ejecuta
         cargarDatos()
     }
     catch(err){
+        // se ejecuta si falla la anterior 
         cargarDatosLocal()
+        
     }
+    
 
+    function setDate(id, fecha){
+        // if(id == "idFechaExpiracion" && fecha == ""){
+        //   $("#alert1").modal("show")
+        // }
+        var fecha1 = fecha.split('/');
+        document.getElementById(id).value = fecha1[2]+"-"+fecha1[1]+"-"+fecha1[0];
+        
+        
+      }
+      document.getElementById("idNacionalidad").value = "Salvadoreña"
+    // agregar("cod_nacionalidad", "Salvadoreña", 222)
     function cargarDatosLocal(){
 
-        for(x = 0; x < inputs.length; x++){   
-            document.getElementById(inputs[x]).value = localStorage.getItem(prop[x]);
-        }
+        let datos = JSON.parse(localStorage.getItem("datosDocumentos"))
 
-        for(y = 0; y < propFechas.length; y++){
+        datos.forEach(elemento => {
+            document.getElementById(elemento.id).value = elemento.data;
+        })
+
+        // for(x = 0; x < inputs.length; x++){   
+        //     document.getElementById(inputs[x]).value = localStorage.getItem(prop[x]);
+        // }
+
+        // for(y = 0; y < propFechas.length; y++){
                     
-            setDate(idsFechas[y], localStorage.getItem(propFechas[y]))
-        }
-        for(x = 0; x < idsSelect.length; x++){
-
-            agregar(idsSelect[x], localStorage.getItem(propSelect[x]), localStorage.getItem(propSelectsValue[x]))
-          
-       }
+        //     setDate(idsFechas[y], localStorage.getItem(propFechas[y]))
+        // }
+        
+       console.log("Cargado desde el localstorage")
     }
 
     // const optionC = document.createElement('option');
@@ -122,7 +179,7 @@ function main(params) {
     // optionC.text = "CARNET DE RESIDENTE";
 
     function agregar(id, texto, valor){
-                
+          console.log(id, texto, valor)      
         let selector = document.getElementById(id)
         const option = document.createElement('option');
         option.value = valor;
@@ -144,55 +201,103 @@ function main(params) {
         selector.value = valor;
       };
 
-        document.getElementById("buttonActualizar").addEventListener("click", function(e){
-            e.preventDefault()
-            let respuesta = true
+        document.getElementById("buttonActualizar").addEventListener("click", (e) => {
 
-            respuesta = validaValores()
-            console.log(respuesta)
-            if(respuesta){
-                let datosInputs = []
-                let datosFechas = [""]
-                let datosSelect= []
-                let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"]
-                console.log("inputs actualizar")
-                console.log(inputs)
-                for(x = 0; x < inputs.length; x++){  
-                    try{
-                        datosInputs[x] = document.getElementById(inputs[x]).value
+                e.preventDefault();
+                let respuesta = true;
+
+                // respuesta = validaValores()
+                comparacion();
+                if (false) {
+                    let datosInputs = [];
+                    let datosFechas = [""];
+                    let datosSelect = [];
+                    let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"];
+                    console.log("inputs actualizar");
+                    console.log(inputs);
+                    for (x = 0; x < inputs.length; x++) {
+                        try {
+                            datosInputs[x] = document.getElementById(inputs[x]).value;
+                        }
+                        catch (err) {
+                        }
                     }
-                    catch(err){
-    
+                    console.log(propFechas);
+                    for (y = 0; y < fechasId.length; y++) {
+                        console.log("id fecha");
+                        console.log(propFechas[y]);
+                        datosFechas[y] = document.getElementById(fechasId[y]).value;
                     }
+
+                    for (x = 0; x < idsSelect.length; x++) {
+                        let seleccion = document.getElementById(idsSelect[x]);
+                        // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
+                        datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
+                    }
+                    const dataInput = datosInputs.concat(datosSelect, datosFechas);
+
+                    //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
+                    // console.log(datosInputs)
+                    // console.log(datosFechas)
+                    // console.log(propFechas)
+                    console.log("valores inputs");
+                    console.log(dataInput);
+                    const valoresServicio = cargarDatosLocalStorage();
+                    registrarCambios(dataInput, valoresServicio);
+                } else {
+                    // $("#modalRequerido").modal("show")
                 }
-                console.log(propFechas)   
-                for(y = 0; y < fechasId.length; y++){
-                    console.log("id fecha")
-                    console.log(propFechas[y])      
-                    datosFechas[y] = document.getElementById(fechasId[y]).value
+
+
+            })
+        function comparacion(){
+            let objetoData = JSON.parse(localStorage.getItem("datosDocumentos"))
+            // let tipoDocumento = document.getElementById("selectTipoDoc").value
+            let cambios = []
+            objetoData.forEach((elemento, index) => {
+                console.log(elemento.id)
+                // console.log(elemento)
+                let valorCampo = document.getElementById(elemento.id)
+                
+                let columna = valorCampo.getAttribute("data-columna")
+                let json = valorCampo.getAttribute("data-json")
+                let grupo = valorCampo.getAttribute("data-grupo")
+                let valorLocal = elemento.data
+                
+                if(valorCampo.value != valorLocal){
+                    cambios.push({
+                        id: elemento.id,
+                        valorActual: valorLocal,
+                        valorNuevo: valorCampo.value,
+                        columna: columna,
+                        json: json,
+                        grupo: grupo
+                        
+                    })
+
+                    objetoData.splice(index, 1, {
+                        id: elemento.id,
+                        data: valorCampo.value
+                    })
+                   
                 }
-    
-                for(x = 0; x < idsSelect.length; x++){
-                    let seleccion = document.getElementById(idsSelect[x])
-                    // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
-                    datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
-               }
-               const dataInput = datosInputs.concat(datosSelect, datosFechas);
-               
-            //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
-                // console.log(datosInputs)
-                // console.log(datosFechas)
-                // console.log(propFechas)
-                console.log("valores inputs")
-                console.log(dataInput)
-                const valoresServicio = cargarDatosLocalStorage()
-                registrarCambios(dataInput, valoresServicio)
-            }else{
-                $("#modalRequerido").modal("show")
-            }
+
+
+            })
+
             
-            
-        })
+            localStorage.setItem("datosDocumentos", JSON.stringify(objetoData))
+            localStorage.setItem("cambios", JSON.stringify(cambios))
+        }
+
+        // function cargarValoresNuevos(){
+        //     console.log("cargar datos nuevos")
+        //     let objetoNuevo = JSON.parse(localStorage.getItem("cambios"))
+        //     objetoNuevo.forEach(elemento => {
+        //         document.getElementById(elemento.id).value = elemento.valorNuevo
+        //     })
+
+        // }
 
     document.getElementById("idTipoDocumento").addEventListener("change", function(){
         
@@ -204,41 +309,182 @@ function main(params) {
     // document.getElementById("select").selectedIndex =
     function validaValores(){
 
-        let valor = document.getElementById("selectTipoDoc").value
-        
-        if(valor == "10"){
-            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento", "selectEstadoCivil", "selectGenero", "selectNacionalidad", "lugar_expedicion_id", "nombre_padre", "nombre_madre", "nombre_conyuge", "profesion_afiliado"]
-        }else if(valor == "2"){
-            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
-        }else if(valor == "3"){
-            var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
-        }
+        let tipoDoc = document.getElementById("selectTipoDoc").value
+        // let tipo = ""
+        // if(valor == "10"){
+            // tipo = "Dui"
+            var requeridos = [
+                {
+                    id: "inputProfesion",
+                    nombre: "Profesión u oficio",
+                    longitudMaxima: 200,
+                    requerido: true,
+                    tipoDocumento: ["10"]
+                },
+                {
+                    id: "inputNombreConyuge",
+                    nombre: "Cónyuge",
+                    longitudMaxima: 200,
+                    requerido: true,
+                    tipoDocumento: ["10"]
+                },
+                {
+                    id: "inputNombreMadre",
+                    nombre: "Nombre de la madre",
+                    longitudMaxima: 200,
+                    requerido: true,
+                    tipoDocumento: ["10"]
+                },
+                {
+                    id: "inputNombrePadre",
+                    nombre: "Nombre del padre",
+                    longitudMaxima: 200,
+                    requerido: true,
+                    tipoDocumento: ["10"]
+                },
+                {
+                    id: "selectGenero",
+                    nombre: "Género",
+                    longitudMaxima: 2,
+                    requerido: true,
+                    tipoDocumento: ["3", "10"]
+                },
+                {
+                    id: "idFechaNacimiento",
+                    nombre: "Fecha nacimiento",
+                    longitudMaxima: 100,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "selectEstadoCivil",
+                    nombre: "Estado civil",
+                    longitudMaxima: 2,
+                    requerido: true,
+                    tipoDocumento: ["10"]
+                },
+                {
+                    id: "inputConocidoPor",
+                    nombre: "Conocido por",
+                    longitudMaxima: 50,
+                    requerido: false,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "inputApellidoCasada",
+                    nombre: "Apellido casada",
+                    longitudMaxima: 20,
+                    requerido: false,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "inputSegundoApellido",
+                    nombre: "Segundo apellido",
+                    longitudMaxima: 20,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "inputPrimerApellido",
+                    nombre: "Primer apellido",
+                    longitudMaxima: 20,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "Segundo_nombre",
+                    nombre: "Segundo nombre",
+                    longitudMaxima: 20,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "Primer_nombre",
+                    nombre: "Primer nombre",
+                    longitudMaxima: 20,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "idFechaExpiracion",
+                    nombre: "Fecha expiración",
+                    longitudMaxima: 100,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "idFechaExpedicion",
+                    nombre: "Fecha expedición",
+                    longitudMaxima: 100,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "inputLugarExpedicion",
+                    nombre: "Lugar de expedición",
+                    longitudMaxima: 100,
+                    requerido: true,
+                    tipoDocumento: ["2", "10"]
+                },
+                {
+                    id: "idInputNumDocumento",
+                    nombre: "Numero documento",
+                    longitudMaxima: tipoDoc == "10" ? "10" : tipoDoc == "3" ? "15" : "11",
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                },
+                {
+                    id: "selectTipoDoc",
+                    nombre: "Tipo Documento",
+                    longitudMaxima: 5,
+                    requerido: true,
+                    tipoDocumento: ["2", "3", "10"]
+                }
+            ]
+            // var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento", "selectEstadoCivil", "selectGenero", "selectNacionalidad", "lugar_expedicion_id", "nombre_padre", "nombre_madre", "nombre_conyuge", "profesion_afiliado"]
+        // }else if(valor == "2"){
+        //     tipo = "Carnet de Residente"
+        //     var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
+        // }else if(valor == "3"){
+        //     tipo = "Pasaporte"
+        //     var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
+        // }
 
-        for(x = 0; x < requeridos.length; x++){
+        // for(x = 0; x < requeridos.length; x++){
                 
-            let valorInput = document.getElementById(requeridos[x]).value
+        //     let valorInput = document.getElementById(requeridos[x]).value
             
-            if(valorInput == null || valorInput.length == 0 || valorInput === "" || valorInput === "DEFAULT"){
-                
-                return false
+        //     if(valorInput === null || valorInput.length < 1  || valorInput === "" || valorInput === "DEFAULT"){
+        //         $("#msjModalError").html(`Existen campos vacios para ${tipo}`);
+		//         $('#modalCiError').modal();
+        //         return false
+        //     }
+            
+        // }
+
+        
+
+        
+        requeridos.forEach(elemento => {
+            
+            let valorInput = document.getElementById(elemento.id).value
+            console.log(tipoDoc)
+            
+            if(elemento.tipoDocumento.includes(tipoDoc) && elemento.requerido){
+                if(valorInput < 1 || valorInput == "DEFAULT"){
+                    $("#msjModalError").html(`${elemento.nombre} es un campo requerido`);
+                    $('#modalCiError').modal();
+                    return false
+                }
+                if(valorInput.length > elemento.longitudMaxima){
+                    $("#msjModalError").html(`${elemento.nombre} debe ser menor que ${elemento.longitudMaxima} caracteres`);
+                    $('#modalCiError').modal();
+                    return false
+                }
             }
             
-        }
-
-        // let requeridos = ["Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "inputLugarExpedicion", "idInputNumDocumento"]
-
-           
-        //     for(x = 0; x < requeridos.length; x++){
-                
-        //        let valorInput = document.getElementById(requeridos[x]).value
-        //         console.log(valorInput)
-        //         if(valorInput == null || valorInput.length == 0 || valorInput === ""){
-        //             // console.log("no")
-        //             // console.log(valorInput)
-        //             return false
-        //         }
-                
-        //     }
+        })
+      
 
         
 
@@ -343,11 +589,30 @@ function main(params) {
         // // let arregloIds = ["inputdoc3", "inputdoc2", "inputdoc18"];
         // // idsFechas.forEach(id => {
             document.getElementById("idFechaExpiracion").onchange = function(){
-                  console.log("validar fecha")
-                  validarExpiracion(getDateToday(), this.value)
+                  
                 
                 
             }
+        document.getElementById("idFechaExpiracion").addEventListener("change", function(){
+            console.log("validar fecha")
+            validarExpiracion(getDateToday(), this.value)
+        })
+
+        
+
+        // $("#"+idInput).change(function(){
+        //     var optionSelected = $(this).find("option:selected");
+        //     var valueSelected  = optionSelected.val()
+        //     let estado = localStorage.getItem('idModalfrenteIsss')
+
+        //     if(!estado){
+        //         $("#alert1").modal("show")
+        //     }
+            
+        // })
+    
+        
+
         // // })
 
         
