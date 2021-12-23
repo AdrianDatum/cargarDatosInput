@@ -8,6 +8,12 @@
  * @return {void}
  */
 function main(params) {
+
+    $( document ).ready(function(){
+        
+        setTimeout(actualizarData, 3000);
+        
+    });
     
     var node = document.getElementById(params.portletElementId);
     // obteniendo propiedades de las configuraciones
@@ -63,6 +69,8 @@ function main(params) {
                     
                     localStorage.setItem(i, persona[i])
                 }
+                localStorage.setItem('info_persona',JSON.stringify(data));
+                
 
                 // agregando la informacion en los campos inputs 
                 for(x = 0; x < inputs.length; x++){
@@ -89,7 +97,7 @@ function main(params) {
                     
                     datosDoc.push({
                         id: idsFechas[y],
-                        data: fecha1[2]+"-"+fecha1[1]+"-"+fecha1[0]
+                        data: fecha1[0]+"/"+fecha1[1]+"/"+fecha1[2]
                     })
                     localStorage.setItem(propFechas[y], persona[propFechas[y]])
                     
@@ -125,6 +133,7 @@ function main(params) {
                 })
                 
                 localStorage.setItem('datosDocumentos',JSON.stringify(datosDoc));
+                localStorage.setItem('newObject',JSON.stringify(datosDoc));
                 localStorage.setItem('cargado', true)
                 console.log("Cargado desde el servicio")
             }
@@ -148,7 +157,7 @@ function main(params) {
         //   $("#alert1").modal("show")
         // }
         var fecha1 = fecha.split('/');
-        document.getElementById(id).value = fecha1[2]+"-"+fecha1[1]+"-"+fecha1[0];
+        document.getElementById(id).value = fecha1[0]+"/"+fecha1[1]+"/"+fecha1[2];
         
         
       }
@@ -178,83 +187,53 @@ function main(params) {
     // optionC.value = 3;
     // optionC.text = "CARNET DE RESIDENTE";
 
-    function agregar(id, texto, valor){
-          console.log(id, texto, valor)      
-        let selector = document.getElementById(id)
-        const option = document.createElement('option');
-        option.value = valor;
-        option.text = texto;
-        // if(id == "selectTipoDoc"){
-        //   const optionC = document.createElement('option');
-        //   optionC.value = 3;
-        //   optionC.text = "CARNET DE RESIDENTE";
-        //   selector.appendChild(optionC);
-        // }else if(id == "selectEstadoCivil"){
-        //   const optionE = document.createElement('option');
-        //   optionE.value = 3;
-        //   optionE.text = "SOLTERO(A)";
-        //   selector.appendChild(optionE);
-        // }
+    // function agregar(id, texto, valor){
+    //       console.log(id, texto, valor)      
+    //     let selector = document.getElementById(id)
+    //     const option = document.createElement('option');
+    //     option.value = valor;
+    //     option.text = texto;
+    //     // if(id == "selectTipoDoc"){
+    //     //   const optionC = document.createElement('option');
+    //     //   optionC.value = 3;
+    //     //   optionC.text = "CARNET DE RESIDENTE";
+    //     //   selector.appendChild(optionC);
+    //     // }else if(id == "selectEstadoCivil"){
+    //     //   const optionE = document.createElement('option');
+    //     //   optionE.value = 3;
+    //     //   optionE.text = "SOLTERO(A)";
+    //     //   selector.appendChild(optionE);
+    //     // }
         
-        selector.appendChild(option);
+    //     selector.appendChild(option);
         
-        selector.value = valor;
-      };
-
-        document.getElementById("buttonActualizar").addEventListener("click", (e) => {
+    //     selector.value = valor;
+    //   };
+        function actualizarData(){
+            document.getElementById("buttonActualizar").addEventListener("click", (e) => {
 
                 e.preventDefault();
-                let respuesta = true;
+                // let respuesta = true;
 
                 // respuesta = validaValores()
                 comparacion();
-                if (false) {
-                    let datosInputs = [];
-                    let datosFechas = [""];
-                    let datosSelect = [];
-                    let fechasId = ["idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento"];
-                    console.log("inputs actualizar");
-                    console.log(inputs);
-                    for (x = 0; x < inputs.length; x++) {
-                        try {
-                            datosInputs[x] = document.getElementById(inputs[x]).value;
-                        }
-                        catch (err) {
-                        }
-                    }
-                    console.log(propFechas);
-                    for (y = 0; y < fechasId.length; y++) {
-                        console.log("id fecha");
-                        console.log(propFechas[y]);
-                        datosFechas[y] = document.getElementById(fechasId[y]).value;
-                    }
-
-                    for (x = 0; x < idsSelect.length; x++) {
-                        let seleccion = document.getElementById(idsSelect[x]);
-                        // datosSelect[x] =  document.getElementById(idsSelect[x]).value;
-                        datosSelect[x] = seleccion.options[seleccion.selectedIndex].text;
-                    }
-                    const dataInput = datosInputs.concat(datosSelect, datosFechas);
-
-                    //    const idsDataInput = inputs.concat(datosSelect, datosFechas);
-                    // console.log(datosInputs)
-                    // console.log(datosFechas)
-                    // console.log(propFechas)
-                    console.log("valores inputs");
-                    console.log(dataInput);
-                    const valoresServicio = cargarDatosLocalStorage();
-                    registrarCambios(dataInput, valoresServicio);
-                } else {
-                    // $("#modalRequerido").modal("show")
-                }
+                // validaValores()
+                window.location.href = `/web/afiliado/confirmar`;
+               
 
 
             })
+        var datosDirectos = ["fecha_expiracion_id", "nombre_conyuge", "nombre_padre", "nombre_madre", "profesion", "fecha_emision_isss", "fecha_emision_inpep", "fecha_emision_nit"]
+        var dataUpdate = {}
+        var grupo01 = []
+        var grupo02 = []
+        var grupo03 = []
         function comparacion(){
             let objetoData = JSON.parse(localStorage.getItem("datosDocumentos"))
+            let newObject = JSON.parse(localStorage.getItem("newObject"))
             // let tipoDocumento = document.getElementById("selectTipoDoc").value
             let cambios = []
-            objetoData.forEach((elemento, index) => {
+            newObject.forEach((elemento, index) => {
                 console.log(elemento.id)
                 // console.log(elemento)
                 let valorCampo = document.getElementById(elemento.id)
@@ -262,6 +241,7 @@ function main(params) {
                 let columna = valorCampo.getAttribute("data-columna")
                 let json = valorCampo.getAttribute("data-json")
                 let grupo = valorCampo.getAttribute("data-grupo")
+                let label = valorCampo.getAttribute("data-label")
                 let valorLocal = elemento.data
                 
                 if(valorCampo.value != valorLocal){
@@ -271,42 +251,99 @@ function main(params) {
                         valorNuevo: valorCampo.value,
                         columna: columna,
                         json: json,
-                        grupo: grupo
-                        
+                        grupo: grupo,
+                        label: label
                     })
 
                     objetoData.splice(index, 1, {
                         id: elemento.id,
                         data: valorCampo.value
                     })
+
+                   if(datosDirectos.includes(json)){
+
+                        dataUpdate[json] = valorCampo.value
+                   }
+
+                   if(grupo == '01'){
+                        grupo01.push({
+                            codigo_columna: columna,
+                            descripcion_columna: json,
+                            valor_anterior: valorLocal,
+                            valor_nuevo: valorCampo.value
+                        })
+                   }
+
+                   if(grupo == '02'){
+                    grupo02.push({
+                        codigo_columna: columna,
+                        descripcion_columna: json,
+                        valor_anterior: valorLocal,
+                        valor_nuevo: valorCampo.value
+                    })
+                    }
+
+                    if(grupo == '03'){
+                        grupo03.push({
+                            codigo_columna: columna,
+                            descripcion_columna: json,
+                            valor_anterior: valorLocal,
+                            valor_nuevo: valorCampo.value
+                        })
+                   }
                    
                 }
 
 
             })
 
-            
+            console.log(grupo01)
+            console.log(grupo02)
+            console.log(grupo03)
+
+            let grupos = []
+
+            if(grupo01.length > 0){
+                grupos.push(grupo01)
+            }
+            if(grupo02.length > 0){
+                grupos.push(grupo02)
+            }
+            if(grupo03.length > 0){
+                grupos.push(grupo03)
+            }
+
+            console.log(grupos.length)
+
+            localStorage.setItem("info_grupos", JSON.stringify(grupos))
             localStorage.setItem("datosDocumentos", JSON.stringify(objetoData))
             localStorage.setItem("cambios", JSON.stringify(cambios))
+            localStorage.setItem("infoUpdateDirect", JSON.stringify(dataUpdate))
         }
-
-        // function cargarValoresNuevos(){
-        //     console.log("cargar datos nuevos")
-        //     let objetoNuevo = JSON.parse(localStorage.getItem("cambios"))
-        //     objetoNuevo.forEach(elemento => {
-        //         document.getElementById(elemento.id).value = elemento.valorNuevo
-        //     })
-
-        // }
-
-    document.getElementById("idTipoDocumento").addEventListener("change", function(){
-        
-        
-    })
+        }
+       
 
 
+        document.getElementById("selectTipoDoc").addEventListener("change", function(){
+            console.log("Valor del select tipo", this.value)
 
-    // document.getElementById("select").selectedIndex =
+            let modalFrente = document.getElementById("idModalImagenFrente")
+            let modalReverso = document.getElementById("idModalImagenReverso")
+            if(this.value == '10'){
+                modalFrente.setAttribute("data-imagenDoc", "DUI_FRENTE")
+                modalReverso.setAttribute("data-imagenDoc", "DUI_REVERSO")
+            }else if(this.value == '2'){
+                modalFrente.setAttribute("data-imagenDoc", "CARNET_RESIDENTE_FRENTE")
+                modalReverso.setAttribute("data-imagenDoc", "CARNET_RESIDENTE_REVERSO")
+            }else if(this.value == '3'){
+                modalFrente.setAttribute("data-imagenDoc", "PASAPORTE_FRENTE")
+                modalReverso.setAttribute("data-imagenDoc", "PASAPORTE_REVERSO")
+            }
+
+        })
+
+
+
     function validaValores(){
 
         let tipoDoc = document.getElementById("selectTipoDoc").value
@@ -441,28 +478,7 @@ function main(params) {
                     tipoDocumento: ["2", "3", "10"]
                 }
             ]
-            // var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaExpiracion", "idFechaExpedicion", "idFechaNacimiento", "selectEstadoCivil", "selectGenero", "selectNacionalidad", "lugar_expedicion_id", "nombre_padre", "nombre_madre", "nombre_conyuge", "profesion_afiliado"]
-        // }else if(valor == "2"){
-        //     tipo = "Carnet de Residente"
-        //     var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
-        // }else if(valor == "3"){
-        //     tipo = "Pasaporte"
-        //     var requeridos = ["idInputNumDocumento", "Primer_nombre", "Segundo_nombre", "inputPrimerApellido", "inputSegundoApellido", "idFechaNacimiento", "selectNacionalidad", "idFechaExpiracion", "idFechaExpedicion", "inputLugarExpedicion"]
-        // }
-
-        // for(x = 0; x < requeridos.length; x++){
-                
-        //     let valorInput = document.getElementById(requeridos[x]).value
-            
-        //     if(valorInput === null || valorInput.length < 1  || valorInput === "" || valorInput === "DEFAULT"){
-        //         $("#msjModalError").html(`Existen campos vacios para ${tipo}`);
-		//         $('#modalCiError').modal();
-        //         return false
-        //     }
-            
-        // }
-
-        
+       
 
         
         requeridos.forEach(elemento => {
@@ -476,73 +492,73 @@ function main(params) {
                     $('#modalCiError').modal();
                     return false
                 }
-                if(valorInput.length > elemento.longitudMaxima){
-                    $("#msjModalError").html(`${elemento.nombre} debe ser menor que ${elemento.longitudMaxima} caracteres`);
-                    $('#modalCiError').modal();
-                    return false
-                }
+                
             }
-            
+            if(valorInput.length > elemento.longitudMaxima){
+                $("#msjModalError").html(`${elemento.nombre} debe ser menor que ${elemento.longitudMaxima} caracteres`);
+                $('#modalCiError').modal();
+                return false
+            }
         })
       
 
         
 
     }
-        function cargarDatosLocalStorage(){
-            let inputsLocal = []
-            let selectLocal = []
-            let fechaLocal = []
-            let idinputsLocal = []
-            let idselectLocal = []
-            let idfechaLocal = []
-            for(x = 0; x < inputs.length; x++){   
-                inputsLocal[x] = localStorage.getItem(prop[x]);
-            }
+        // function cargarDatosLocalStorage(){
+        //     let inputsLocal = []
+        //     let selectLocal = []
+        //     let fechaLocal = []
+        //     let idinputsLocal = []
+        //     let idselectLocal = []
+        //     let idfechaLocal = []
+        //     for(x = 0; x < inputs.length; x++){   
+        //         inputsLocal[x] = localStorage.getItem(prop[x]);
+        //     }
     
-            for(y = 0; y < propFechas.length; y++){
+        //     for(y = 0; y < propFechas.length; y++){
                  
-                fechaLocal[y] = localStorage.getItem(propFechas[y])
-            }
-            for(x = 0; x < idsSelect.length; x++){
+        //         fechaLocal[y] = localStorage.getItem(propFechas[y])
+        //     }
+        //     for(x = 0; x < idsSelect.length; x++){
 
-                selectLocal[x] = localStorage.getItem(propSelect[x])
+        //         selectLocal[x] = localStorage.getItem(propSelect[x])
               
-           }
-           const dataInputLocal = inputsLocal.concat(selectLocal, fechaLocal);
-        //    console.log(inputsLocal)
-        //     console.log(selectLocal)
-        console.log("valores locales")
-            console.log(dataInputLocal)
-            return dataInputLocal
-        }
+        //    }
+        //    const dataInputLocal = inputsLocal.concat(selectLocal, fechaLocal);
+        // //    console.log(inputsLocal)
+        // //     console.log(selectLocal)
+        // console.log("valores locales")
+        //     console.log(dataInputLocal)
+        //     return dataInputLocal
+        // }
 
 
 
-        function registrarCambios(dataInput, dataInputLocal){
+        // function registrarCambios(dataInput, dataInputLocal){
             
-            const idsDataInput = inputs.concat(idsSelect, idsFechas);
-            let cambios = []
-            let ids = []
-            for(x = 0; x < dataInputLocal.length; x++){
+        //     const idsDataInput = inputs.concat(idsSelect, idsFechas);
+        //     let cambios = []
+        //     let ids = []
+        //     for(x = 0; x < dataInputLocal.length; x++){
     
-                if(dataInput[x] != dataInputLocal[x]){
-                    cambios.push(dataInput[x])
-                    ids.push(idsDataInput[x])
-                }
-            }
-            console.log("cambios")
-            console.log(dataInput)
-            console.log(dataInputLocal)
-            if(cambios.length){
-                // storage.removeItem("dataCambiada");
-                // storage.removeItem("idsCambios");
-                localStorage.setItem("dataCambiada", JSON.stringify(cambios))
-                localStorage.setItem("idsCambios", JSON.stringify(ids))
-                window.location.href = "https://desa.virtualafpconfia.com/web/afiliado/confirmar";
-            }
+        //         if(dataInput[x] != dataInputLocal[x]){
+        //             cambios.push(dataInput[x])
+        //             ids.push(idsDataInput[x])
+        //         }
+        //     }
+        //     console.log("cambios")
+        //     console.log(dataInput)
+        //     console.log(dataInputLocal)
+        //     if(cambios.length){
+        //         // storage.removeItem("dataCambiada");
+        //         // storage.removeItem("idsCambios");
+        //         localStorage.setItem("dataCambiada", JSON.stringify(cambios))
+        //         localStorage.setItem("idsCambios", JSON.stringify(ids))
+        //         window.location.href = "https://desa.virtualafpconfia.com/web/afiliado/confirmar";
+        //     }
             
-        }
+        // }
         
         
 
@@ -552,51 +568,51 @@ function main(params) {
     // }
     // validar()
 
-          function getDateToday(){
+        //   function getDateToday(){
 
-            var today = new Date();
-            var dd = today.getDate();
-            var mm = today.getMonth() + 1; //January is 0!
-            var yyyy = today.getFullYear();
+        //     var today = new Date();
+        //     var dd = today.getDate();
+        //     var mm = today.getMonth() + 1; //January is 0!
+        //     var yyyy = today.getFullYear();
           
-            if (dd < 10) {
-              dd = '0' + dd;
-            }
+        //     if (dd < 10) {
+        //       dd = '0' + dd;
+        //     }
           
-            if (mm < 10) {
-              mm = '0' + mm;
-            }
+        //     if (mm < 10) {
+        //       mm = '0' + mm;
+        //     }
           
-            today = yyyy + '-' + mm + '-' + dd;
-            return today;
+        //     today = yyyy + '-' + mm + '-' + dd;
+        //     return today;
           
-          }
+        //   }
 
-          function validarExpiracion(hoy, fechaDoc){
-            if(fechaDoc < hoy || fechaDoc == ""){
-              console.log(hoy)
-              console.log(fechaDoc)
-              console.log("expiradad")
-              $("#alert1").modal("show")
-              $("#select2").empty();
-              $("#selectTipoDoc").empty();
-            //   cargarDatos()
-            }
-          }
+        //   function validarExpiracion(hoy, fechaDoc){
+        //     if(fechaDoc < hoy || fechaDoc == ""){
+        //       console.log(hoy)
+        //       console.log(fechaDoc)
+        //       console.log("expiradad")
+        //       $("#alert1").modal("show")
+        //       $("#select2").empty();
+        //       $("#selectTipoDoc").empty();
+        //     //   cargarDatos()
+        //     }
+        //   }
 
         // //   let arregloIds = ["inputdoc3", "inputdoc2", "inputdoc18", "inputisss9", "inputinpep7", "inputnit7"];
 
         // // let arregloIds = ["inputdoc3", "inputdoc2", "inputdoc18"];
         // // idsFechas.forEach(id => {
-            document.getElementById("idFechaExpiracion").onchange = function(){
+        //     document.getElementById("idFechaExpiracion").onchange = function(){
                   
                 
                 
-            }
-        document.getElementById("idFechaExpiracion").addEventListener("change", function(){
-            console.log("validar fecha")
-            validarExpiracion(getDateToday(), this.value)
-        })
+        //     }
+        // document.getElementById("idFechaExpiracion").addEventListener("change", function(){
+        //     console.log("validar fecha")
+        //     validarExpiracion(getDateToday(), this.value)
+        // })
 
         
 
